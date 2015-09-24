@@ -292,6 +292,7 @@ Configure::Configure(int& argc, char** argv) : verbose(0)
     dictionary[ "SQL_SQLITE" ]      = "auto";
     dictionary[ "SQL_SQLITE_LIB" ]  = "qt";
     dictionary[ "SQL_SQLITE2" ]     = "no";
+    dictionary[ "SQL_SQLCIPHER" ]   = "no";
     dictionary[ "SQL_IBASE" ]       = "no";
 
     QString tmp = dictionary[ "QMAKESPEC" ];
@@ -812,6 +813,13 @@ void Configure::parseCmdLine()
             dictionary[ "SQL_SQLITE2" ] = "plugin";
         else if (configCmdLine.at(i) == "-no-sql-sqlite2")
             dictionary[ "SQL_SQLITE2" ] = "no";
+
+        else if (configCmdLine.at(i) == "-qt-sql-sqlcipher")
+            dictionary[ "SQL_SQLCIPHER" ] = "yes";
+        else if (configCmdLine.at(i) == "-plugin-sql-sqlcipher")
+            dictionary[ "SQL_SQLCIPHER" ] = "plugin";
+        else if (configCmdLine.at(i) == "-no-sql-sqlcipher")
+            dictionary[ "SQL_SQLCIPHER" ] = "no";
 
         else if (configCmdLine.at(i) == "-qt-sql-ibase")
             dictionary[ "SQL_IBASE" ] = "yes";
@@ -1880,6 +1888,7 @@ bool Configure::displayHelp()
         desc("SQL_DB2", "auto", "",                     "  db2", ' ');
         desc("SQL_SQLITE", "auto", "",                  "  sqlite", ' ');
         desc("SQL_SQLITE2", "auto", "",                 "  sqlite2", ' ');
+        desc("SQL_SQLCIPHER", "auto", "",               "  sqlcipher", ' ');
         desc("SQL_IBASE", "auto", "",                   "  ibase", ' ');
         desc(                   "",                     "(drivers marked with a '+' have been detected as available on this system)\n", false, ' ');
 
@@ -2148,6 +2157,7 @@ QString Configure::defaultTo(const QString &option)
             || option == "SQL_DB2"
             || option == "SQL_SQLITE"
             || option == "SQL_SQLITE2"
+            || option == "SQL_SQLCIPHER"
             || option == "SQL_IBASE"
             || option == "JPEG"
             || option == "GIF")
@@ -2915,6 +2925,11 @@ void Configure::generateOutputVars()
         qmakeSql += "sqlite2";
     else if (dictionary[ "SQL_SQLITE2" ] == "plugin")
         qmakeSqlPlugins += "sqlite2";
+
+    if (dictionary[ "SQL_SQLCIPHER" ] == "yes")
+        qmakeSql += "sqlcipher";
+    else if (dictionary[ "SQL_SQLCIPHER" ] == "plugin")
+        qmakeSqlPlugins += "sqlcipher";
 
     if (dictionary[ "SQL_IBASE" ] == "yes")
         qmakeSql += "ibase";
