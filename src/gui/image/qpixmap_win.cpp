@@ -371,31 +371,33 @@ Q_GUI_EXPORT QPixmap qt_pixmapFromWinHICON(HICON icon)
     DrawIconEx( hdc, 0, 0, icon, iconinfo.xHotspot * 2, iconinfo.yHotspot * 2, 0, 0, DI_NORMAL);
     QImage image = qt_imageFromWinIconHBITMAP(hdc, winBitmap, w, h);
 
-    for (int y = 0 ; y < h && !foundAlpha ; y++) {
-        const QRgb *scanLine= reinterpret_cast<const QRgb *>(image.scanLine(y));
-        for (int x = 0; x < w ; x++) {
-            if (qAlpha(scanLine[x]) != 0) {
-                foundAlpha = true;
-                break;
-            }
-        }
-    }
-    if (!foundAlpha) {
-        //If no alpha was found, we use the mask to set alpha values
-        DrawIconEx( hdc, 0, 0, icon, w, h, 0, 0, DI_MASK);
-        const QImage mask = qt_imageFromWinIconHBITMAP(hdc, winBitmap, w, h);
+	if( !image.isNull() ) {
+		for (int y = 0 ; y < h && !foundAlpha ; y++) {
+			const QRgb *scanLine= reinterpret_cast<const QRgb *>(image.scanLine(y));
+			for (int x = 0; x < w ; x++) {
+				if (qAlpha(scanLine[x]) != 0) {
+					foundAlpha = true;
+					break;
+				}
+			}
+		}
+		if (!foundAlpha) {
+			//If no alpha was found, we use the mask to set alpha values
+			DrawIconEx( hdc, 0, 0, icon, w, h, 0, 0, DI_MASK);
+			const QImage mask = qt_imageFromWinIconHBITMAP(hdc, winBitmap, w, h);
 
-        for (int y = 0 ; y < h ; y++){
-            QRgb *scanlineImage = reinterpret_cast<QRgb *>(image.scanLine(y));
-            const QRgb *scanlineMask = mask.isNull() ? 0 : reinterpret_cast<const QRgb *>(mask.scanLine(y));
-            for (int x = 0; x < w ; x++){
-                if (scanlineMask && qRed(scanlineMask[x]) != 0)
-                    scanlineImage[x] = 0; //mask out this pixel
-                else
-                    scanlineImage[x] |= 0xff000000; // set the alpha channel to 255
-            }
-        }
-    }
+			for (int y = 0 ; y < h ; y++){
+				QRgb *scanlineImage = reinterpret_cast<QRgb *>(image.scanLine(y));
+				const QRgb *scanlineMask = mask.isNull() ? 0 : reinterpret_cast<const QRgb *>(mask.scanLine(y));
+				for (int x = 0; x < w ; x++){
+					if (scanlineMask && qRed(scanlineMask[x]) != 0)
+						scanlineImage[x] = 0; //mask out this pixel
+					else
+						scanlineImage[x] |= 0xff000000; // set the alpha channel to 255
+				}
+			}
+		}
+	}
     //dispose resources created by iconinfo call
     DeleteObject(iconinfo.hbmMask);
     DeleteObject(iconinfo.hbmColor);
