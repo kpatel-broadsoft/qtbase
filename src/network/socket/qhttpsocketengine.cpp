@@ -590,7 +590,7 @@ void QHttpSocketEngine::slotSocketReadNotification()
 
         priv->parseHttpResponse(d->reply->header(), true);
 
-        if (priv->phase == QAuthenticatorPrivate::Invalid) {
+        if (priv->phase == QAuthenticatorPrivate::Invalid || priv->hasFailed) {
             // problem parsing the reply
             d->socket->close();
             setState(QAbstractSocket::UnconnectedState);
