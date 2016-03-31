@@ -845,8 +845,10 @@ void QHttpNetworkConnectionChannel::_q_connected()
                 QMetaObject::invokeMethod(connection, "_q_startNextRequest", Qt::QueuedConnection);
             }
         } else {
-            if (!reply)
-                connection->d_func()->dequeueRequest(socket);
+            if (!reply) {
+                if (!connection->d_func()->dequeueRequest(socket))
+                    close();
+            }
             if (reply)
                 sendRequest();
         }
@@ -1139,8 +1141,10 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
             QMetaObject::invokeMethod(connection, "_q_startNextRequest", Qt::QueuedConnection);
         }
     } else { // HTTP
-        if (!reply)
-            connection->d_func()->dequeueRequest(socket);
+        if (!reply) {
+            if (!connection->d_func()->dequeueRequest(socket))
+                close();
+        }
         if (reply) {
             reply->setSpdyWasUsed(false);
             Q_ASSERT(reply->d_func()->connectionChannel == this);
