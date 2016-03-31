@@ -827,8 +827,10 @@ void QHttpNetworkConnectionChannel::_q_connected()
 #endif
     } else {
         state = QHttpNetworkConnectionChannel::IdleState;
-        if (!reply)
-            connection->d_func()->dequeueRequest(socket);
+        if (!reply) {
+            if (!connection->d_func()->dequeueRequest(socket))
+                close();
+        }
         if (reply)
             sendRequest();
     }
@@ -1066,8 +1068,10 @@ void QHttpNetworkConnectionChannel::_q_encrypted()
             // wait for data from the server first (e.g. initial window, max concurrent requests)
             QMetaObject::invokeMethod(connection, "_q_startNextRequest", Qt::QueuedConnection);
     } else { // HTTP
-        if (!reply)
-            connection->d_func()->dequeueRequest(socket);
+        if (!reply) {
+            if (!connection->d_func()->dequeueRequest(socket))
+                close();
+        }
         if (reply) {
             reply->setSpdyWasUsed(false);
             emit reply->encrypted();
