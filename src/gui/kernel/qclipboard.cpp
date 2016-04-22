@@ -328,6 +328,9 @@ void QClipboard::setText(const QString &text, Mode mode)
 {
     QMimeData *data = new QMimeData;
     data->setText(text);
+#ifdef Q_OS_MAC
+    data->setHtml(text);
+#endif
     setMimeData(data, mode);
 }
 
