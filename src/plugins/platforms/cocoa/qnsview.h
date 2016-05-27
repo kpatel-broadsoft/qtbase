@@ -106,6 +106,8 @@ Q_FORWARD_DECLARE_OBJC_CLASS(QT_MANGLE_NAMESPACE(QNSViewMouseMoveHelper));
 - (void)viewDidUnhide;
 - (void)removeFromSuperview;
 - (void)cancelComposingText;
+- (NSString*) selection;
+- (BOOL) selectionIsEmpty;
 
 - (BOOL)isFlipped;
 - (BOOL)acceptsFirstResponder;

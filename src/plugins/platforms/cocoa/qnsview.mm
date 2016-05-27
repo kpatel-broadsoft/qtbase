@@ -136,6 +136,54 @@ static bool _q_dontOverrideCtrlLMB = false;
 + (void)initialize
 {
     _q_dontOverrideCtrlLMB = qt_mac_resolveOption(false, "QT_MAC_DONT_OVERRIDE_CTRL_LMB");
+
+    static BOOL initialized = NO;
+    /* Make sure code only gets executed once. */
+    if (initialized == YES) return;
+    initialized = YES;
+
+    [NSApp registerServicesMenuSendTypes:[NSArray arrayWithObjects:NSStringPboardType,
+                    NSRTFPboardType, nil] returnTypes:[NSArray arrayWithObjects:NSStringPboardType,
+                    nil]];
+}
+
+- (id)validRequestorForSendType:(NSString *)sendType
+            returnType:(NSString *)returnType
+{
+    if ([sendType isEqual:NSStringPboardType] && ![self selectionIsEmpty] ) {
+            return self;
+    }
+    return [super validRequestorForSendType:sendType returnType:returnType];
+}
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+types:(NSArray *)types
+{
+     NSArray *typesDeclared;
+
+    if ([types containsObject:NSStringPboardType] == NO) {
+        return NO;
+    }
+    typesDeclared = [NSArray arrayWithObject:NSStringPboardType];
+    [pboard declareTypes:typesDeclared owner:nil];
+    return [pboard setString:[self selection]
+                    forType:NSStringPboardType];
+}
+
+- (BOOL) selectionIsEmpty
+{
+    NSString* string = [self selection];
+    return (!string || [string length] == 0) ? YES : NO;
+}
+
+- (NSString*) selection
+{
+    NSAttributedString* sel = nil;
+    NSRange selRange = [self selectedRange];
+    if (selRange.length != 0)
+        sel = [self attributedSubstringForProposedRange:selRange actualRange:nil];
+
+    return sel.string;
 }
 
 - (id) init
@@ -1848,10 +1896,8 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
     QObject *fo = m_platformWindow->window()->focusObject();
     if (!fo)
         return nil;
-    QInputMethodQueryEvent queryEvent(Qt::ImEnabled | Qt::ImCurrentSelection);
+    QInputMethodQueryEvent queryEvent(Qt::ImCurrentSelection);
     if (!QCoreApplication::sendEvent(fo, &queryEvent))
-        return nil;
-    if (!queryEvent.value(Qt::ImEnabled).toBool())
         return nil;
 
     QString selectedText = queryEvent.value(Qt::ImCurrentSelection).toString();
@@ -1883,10 +1929,8 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
     QObject *fo = m_platformWindow->window()->focusObject();
     if (!fo)
         return selectedRange;
-    QInputMethodQueryEvent queryEvent(Qt::ImEnabled | Qt::ImCurrentSelection);
+    QInputMethodQueryEvent queryEvent(Qt::ImCurrentSelection);
     if (!QCoreApplication::sendEvent(fo, &queryEvent))
-        return selectedRange;
-    if (!queryEvent.value(Qt::ImEnabled).toBool())
         return selectedRange;
 
     QString selectedText = queryEvent.value(Qt::ImCurrentSelection).toString();
