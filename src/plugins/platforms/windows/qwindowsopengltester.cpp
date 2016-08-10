@@ -338,7 +338,7 @@ bool QWindowsOpenGLTester::testDesktopGL()
         memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
         pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
         pfd.nVersion = 1;
-        pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_GENERIC_FORMAT;
+        pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_GENERIC_FORMAT | PFD_SUPPORT_GDI;
         pfd.iPixelType = PFD_TYPE_RGBA;
         // Use the GDI functions. Under the hood this will call the wgl variants in opengl32.dll.
         int pixelFormat = ChoosePixelFormat(dc, &pfd);
