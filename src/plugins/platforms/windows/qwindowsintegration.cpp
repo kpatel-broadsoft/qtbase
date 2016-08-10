@@ -346,11 +346,12 @@ QWindowsWindow *QWindowsIntegration::createPlatformWindowHelper(QWindow *window,
 QWindowsStaticOpenGLContext *QWindowsStaticOpenGLContext::doCreate()
 {
 #if defined(QT_OPENGL_DYNAMIC)
+    const QWindowsOpenGLTester::Renderers supportedRenderers = QWindowsOpenGLTester::supportedRenderers();
     QWindowsOpenGLTester::Renderer requestedRenderer = QWindowsOpenGLTester::requestedRenderer();
     switch (requestedRenderer) {
     case QWindowsOpenGLTester::DesktopGl:
         if (QWindowsStaticOpenGLContext *glCtx = QOpenGLStaticContext::create()) {
-            if ((QWindowsOpenGLTester::supportedRenderers() & QWindowsOpenGLTester::DisableRotationFlag)
+            if ((supportedRenderers & QWindowsOpenGLTester::DisableRotationFlag)
                 && !QWindowsScreen::setOrientationPreference(Qt::LandscapeOrientation)) {
                 qCWarning(lcQpaGl, "Unable to disable rotation.");
             }
@@ -376,7 +377,6 @@ QWindowsStaticOpenGLContext *QWindowsStaticOpenGLContext::doCreate()
         break;
     }
 
-    const QWindowsOpenGLTester::Renderers supportedRenderers = QWindowsOpenGLTester::supportedRenderers();
     if (supportedRenderers & QWindowsOpenGLTester::DesktopGl) {
         if (QWindowsStaticOpenGLContext *glCtx = QOpenGLStaticContext::create()) {
             if ((supportedRenderers & QWindowsOpenGLTester::DisableRotationFlag)
