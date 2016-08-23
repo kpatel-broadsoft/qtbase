@@ -1840,8 +1840,8 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
 
 - (NSRange) selectedRange
 {
-    NSRange selectedRange = {NSNotFound, 0};
-    selectedRange.location = NSNotFound;
+    NSRange selectedRange = {0, 0};
+    selectedRange.location = 0;
     selectedRange.length = 0;
 
     QObject *fo = QGuiApplication::focusObject();
