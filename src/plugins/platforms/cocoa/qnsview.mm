@@ -1864,24 +1864,29 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
 {
     Q_UNUSED(aRange)
     Q_UNUSED(actualRange)
+
+    NSRect rect = NSZeroRect;
+
     QObject *fo = QGuiApplication::focusObject();
     if (!fo)
-        return NSZeroRect;
+        return rect;
 
     QInputMethodQueryEvent queryEvent(Qt::ImEnabled);
     if (!QCoreApplication::sendEvent(fo, &queryEvent))
-        return NSZeroRect;
+        return rect;
     if (!queryEvent.value(Qt::ImEnabled).toBool())
-        return NSZeroRect;
+    {
+        rect.size.width = 1;
+        return rect;
+    }
 
     if (!m_window)
-        return NSZeroRect;
+        return rect;
 
     // The returned rect is always based on the internal cursor.
     QRect mr = qApp->inputMethod()->cursorRectangle().toRect();
     QPoint mp = m_window->mapToGlobal(mr.bottomLeft());
 
-    NSRect rect;
     rect.origin.x = mp.x();
     rect.origin.y = qt_mac_flipYCoordinate(mp.y());
     rect.size.width = mr.width();
