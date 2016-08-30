@@ -1839,23 +1839,28 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
 
 - (NSRange) selectedRange
 {
-    NSRange selectedRange = {0, 0};
-    selectedRange.location = 0;
+    NSRange selectedRange = {NSNotFound, 0};
+    selectedRange.location = NSNotFound;
     selectedRange.length = 0;
 
     QObject *fo = QGuiApplication::focusObject();
     if (!fo)
         return selectedRange;
-    QInputMethodQueryEvent queryEvent( Qt::ImCurrentSelection);
+
+    QInputMethodQueryEvent queryEvent(Qt::ImCurrentSelection | Qt::ImHints);
     if (!QCoreApplication::sendEvent(fo, &queryEvent))
         return selectedRange;
 
-    QString selectedText = queryEvent.value(Qt::ImCurrentSelection).toString();
 
-    if (!selectedText.isEmpty()) {
-        selectedRange.location = 0;
-        selectedRange.length = selectedText.length();
-    }
+    bool ok = false;
+    Qt::InputMethodHints hints = static_cast<Qt::InputMethodHints>(queryEvent.value(Qt::ImHints).toUInt(&ok));
+    if (!ok || hints.testFlag(Qt::ImhHiddenText))
+        return selectedRange;
+
+    QString selectedText = queryEvent.value(Qt::ImCurrentSelection).toString();
+    selectedRange.location = 0;
+    selectedRange.length = selectedText.length();
+
     return selectedRange;
 }
 
@@ -1867,13 +1872,17 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
     NSRect rect = NSZeroRect;
 
     QObject *fo = QGuiApplication::focusObject();
+
     if (!fo)
         return rect;
 
-    QInputMethodQueryEvent queryEvent(Qt::ImEnabled);
+    QInputMethodQueryEvent queryEvent(Qt::ImEnabled | Qt::ImHints);
     if (!QCoreApplication::sendEvent(fo, &queryEvent))
         return rect;
-    if (!queryEvent.value(Qt::ImEnabled).toBool())
+
+    bool ok = false;
+    Qt::InputMethodHints hints = static_cast<Qt::InputMethodHints>(queryEvent.value(Qt::ImHints).toUInt(&ok));
+    if (!ok || !queryEvent.value(Qt::ImEnabled).toBool() || hints.testFlag(Qt::ImhHiddenText))
     {
         rect.size.width = 1;
         return rect;
@@ -1890,9 +1899,9 @@ static QTabletEvent::TabletDevice wacomTabletDevice(NSEvent *theEvent)
     rect.origin.y = qt_mac_flipYCoordinate(mp.y());
     rect.size.width = mr.width();
     rect.size.height = mr.height();
+
     return rect;
 }
-
 - (NSUInteger)characterIndexForPoint:(NSPoint)aPoint
 {
     // We don't support cursor movements using mouse while composing.
