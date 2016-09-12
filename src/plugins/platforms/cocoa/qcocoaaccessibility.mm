@@ -207,6 +207,13 @@ NSString *macSubrole(QAccessibleInterface *interface)
 */
 bool shouldBeIgnored(QAccessibleInterface *interface)
 {
+    // Skip all disabled widgets
+    if (const QObject * const object = interface->object()) {
+        auto enabled = object->property("enabled");
+        if (enabled.isValid() && !enabled.toBool())
+            return true;
+    }
+
     // Cocoa accessibility does not have an attribute that corresponds to the Invisible/Offscreen
     // state. Ignore interfaces with those flags set.
     const QAccessible::State state = interface->state();
