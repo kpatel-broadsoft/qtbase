@@ -321,7 +321,7 @@ void QCocoaMenuBar::updateMenuBarImmediately()
         menu->setMenuParent(mb);
         // force a sync?
         mb->syncMenu(menu);
-        menu->propagateEnabledState(!disableForModal);
+        menu->syncModalState(disableForModal);
     }
 
     QCocoaMenuLoader *loader = getMenuLoader();
