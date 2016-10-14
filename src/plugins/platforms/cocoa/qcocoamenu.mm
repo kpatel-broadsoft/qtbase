@@ -339,6 +339,10 @@ void QCocoaMenu::insertNative(QCocoaMenuItem *item, QCocoaMenuItem *beforeItem)
         beforeItem = itemOrNull(m_menuItems.indexOf(beforeItem) + 1);
     }
 
+    NSMenuItem * nativeItemInMenu = [m_nativeMenu itemWithTag:reinterpret_cast<NSInteger>(item)];
+    if (nativeItemInMenu)
+        [m_nativeMenu removeItem: nativeItemInMenu];
+
     if (beforeItem) {
         if (beforeItem->isMerged()) {
             qWarning("No non-merged before menu item found");
