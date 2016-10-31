@@ -265,6 +265,7 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
     }
 
     if ([attribute isEqualToString:NSAccessibilityRoleAttribute]) {
+        role = QCocoaAccessible::macRole(iface);
         return role;
     } else if ([attribute isEqualToString:NSAccessibilitySubroleAttribute]) {
         return QCocoaAccessible::macSubrole(iface);
