@@ -49,24 +49,7 @@ QT_BEGIN_NAMESPACE
 
 class QCocoaMenu;
 
-class QCocoaMenuObject
-{
-public:
-    void setMenuParent(QObject *o)
-    {
-        parent = o;
-    }
-
-    QObject *menuParent() const
-    {
-        return parent;
-    }
-
-private:
-    QPointer<QObject> parent;
-};
-
-class QCocoaMenuItem : public QPlatformMenuItem, public QCocoaMenuObject
+class QCocoaMenuItem : public QPlatformMenuItem
 {
 public:
     QCocoaMenuItem();
@@ -128,6 +111,9 @@ private:
     quintptr m_tag;
     int m_iconSize;
 };
+
+#define COCOA_MENU_ANCESTOR(m) ((m)->property("_qCocoaMenuAncestor").value<QObject *>())
+#define SET_COCOA_MENU_ANCESTOR(m, ancestor) (m)->setProperty("_qCocoaMenuAncestor", QVariant::fromValue<QObject *>(ancestor))
 
 QT_END_NAMESPACE
 

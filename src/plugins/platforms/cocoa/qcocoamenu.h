@@ -43,7 +43,7 @@ QT_BEGIN_NAMESPACE
 
 class QCocoaMenuBar;
 
-class QCocoaMenu : public QPlatformMenu, public QCocoaMenuObject
+class QCocoaMenu : public QPlatformMenu
 {
 public:
     QCocoaMenu();

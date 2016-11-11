@@ -105,8 +105,8 @@ QCocoaMenuItem::~QCocoaMenuItem()
 {
     QMacAutoReleasePool pool;
 
-    if (m_menu && m_menu->menuParent() == this)
-        m_menu->setMenuParent(0);
+    if (m_menu && COCOA_MENU_ANCESTOR(m_menu) == this)
+        SET_COCOA_MENU_ANCESTOR(m_menu, 0);
     if (m_merged) {
         [m_native setHidden:YES];
     } else {
@@ -132,14 +132,14 @@ void QCocoaMenuItem::setMenu(QPlatformMenu *menu)
         return;
 
     if (m_menu) {
-        if (m_menu->menuParent() == this)
-            m_menu->setMenuParent(0);
+        if (COCOA_MENU_ANCESTOR(m_menu) == this)
+            SET_COCOA_MENU_ANCESTOR(m_menu, 0);
     }
 
     QMacAutoReleasePool pool;
     m_menu = static_cast<QCocoaMenu *>(menu);
     if (m_menu) {
-        m_menu->setMenuParent(this);
+        SET_COCOA_MENU_ANCESTOR(m_menu, this);
     } else {
         // we previously had a menu, but no longer
         // clear out our item so the nexy sync() call builds a new one
@@ -229,14 +229,12 @@ NSMenuItem *QCocoaMenuItem::sync()
             mergeItem = [loader preferencesMenuItem];
             break;
         case TextHeuristicRole: {
-            QObject *p = menuParent();
+            QObject *p = COCOA_MENU_ANCESTOR(this);
             int depth = 1;
             QCocoaMenuBar *menubar = 0;
             while (depth < 3 && p && !(menubar = qobject_cast<QCocoaMenuBar *>(p))) {
                 ++depth;
-                QCocoaMenuObject *menuObject = dynamic_cast<QCocoaMenuObject *>(p);
-                Q_ASSERT(menuObject);
-                p = menuObject->menuParent();
+                p = COCOA_MENU_ANCESTOR(p);
             }
             if (depth == 3 || !menubar)
                 break; // Menu item too deep in the hierarchy, or not connected to any menubar
