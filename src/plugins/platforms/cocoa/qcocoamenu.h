@@ -75,6 +75,8 @@ public:
 
     inline NSMenu *nsMenu() const
         { return m_nativeMenu; }
+    inline NSMenuItem *nsMenuItem() const
+        { return m_nativeItem; }
 
     inline bool isVisible() const { return m_visible; }
 
@@ -83,9 +85,11 @@ public:
 
     QList<QCocoaMenuItem *> items() const;
     QList<QCocoaMenuItem *> merged() const;
+    void setMenuBar(QCocoaMenuBar *menuBar);
+    QCocoaMenuBar *menuBar() const;
 
-    void setAttachedItem(NSMenuItem *item);
-    NSMenuItem *attachedItem() const;
+    void setContainingMenuItem(QCocoaMenuItem *menuItem);
+    QCocoaMenuItem *containingMenuItem() const;
 
 private:
     QCocoaMenuItem *itemOrNull(int index) const;
@@ -93,10 +97,13 @@ private:
 
     QList<QCocoaMenuItem *> m_menuItems;
     NSMenu *m_nativeMenu;
-    NSMenuItem *m_attachedItem;
+    NSMenuItem *m_nativeItem;
+    NSObject *m_delegate;
     bool m_enabled;
     bool m_visible;
     quintptr m_tag;
+    QCocoaMenuBar *m_menuBar;
+    QCocoaMenuItem *m_containingMenuItem;
 };
 
 QT_END_NAMESPACE
