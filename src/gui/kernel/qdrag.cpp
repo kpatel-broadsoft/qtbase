@@ -388,6 +388,18 @@ Qt::DropAction QDrag::defaultAction() const
     return d->default_action;
 }
 
+void QDrag::setEnableSlideBack(bool enable)
+{
+    Q_D(QDrag);
+    d->enableSlideBack = enable;
+}
+
+bool QDrag::enableSlideBack() const
+{
+    Q_D(const QDrag);
+    return d->enableSlideBack;
+}
+
 /*!
     Cancels a drag operation initiated by Qt.
 

@@ -84,6 +84,9 @@ public:
     Qt::DropActions supportedActions() const;
     Qt::DropAction defaultAction() const;
 
+    void setEnableSlideBack(bool enable);
+    bool enableSlideBack() const;
+
     static void cancel();
 
 Q_SIGNALS:

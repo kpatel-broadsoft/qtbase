@@ -146,6 +146,7 @@ Qt::DropAction QCocoaDrag::drag(QDrag *o)
     event_location.y -= flippedY;
     NSSize mouseOffset_unused = NSMakeSize(0.0, 0.0);
     NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+    BOOL enableSlideBack = m_drag->enableSlideBack() ? YES : NO;
 
     [theWindow dragImage:nsimage
         at:event_location
@@ -153,7 +154,7 @@ Qt::DropAction QCocoaDrag::drag(QDrag *o)
         event:m_lastEvent
         pasteboard:pboard
         source:m_lastView
-        slideBack:YES];
+        slideBack:enableSlideBack];
 
     [nsimage release];
 
