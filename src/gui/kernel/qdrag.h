@@ -77,6 +77,9 @@ public:
     Qt::DropActions supportedActions() const;
     Qt::DropAction defaultAction() const;
 
+    void setEnableSlideBack(bool enable);
+    bool enableSlideBack() const;
+
 Q_SIGNALS:
     void actionChanged(Qt::DropAction action);
     void targetChanged(QObject *newTarget);

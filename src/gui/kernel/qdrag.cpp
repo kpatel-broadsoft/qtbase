@@ -377,6 +377,18 @@ Qt::DropAction QDrag::defaultAction() const
     Q_D(const QDrag);
     return d->default_action;
 }
+
+void QDrag::setEnableSlideBack(bool enable)
+{
+    Q_D(QDrag);
+    d->enableSlideBack = enable;
+}
+
+bool QDrag::enableSlideBack() const
+{
+    Q_D(const QDrag);
+    return d->enableSlideBack;
+}
 /*!
     \fn void QDrag::actionChanged(Qt::DropAction action)
 
