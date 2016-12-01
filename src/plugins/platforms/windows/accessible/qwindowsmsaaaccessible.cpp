@@ -783,19 +783,22 @@ HRESULT STDMETHODCALLTYPE QWindowsMsaaAccessible::get_accDescription(VARIANT var
     if (!accessible)
         return E_FAIL;
 
-
-    QString descr;
-    if (varID.lVal) {
-        QAccessibleInterface *child = childPointer(accessible, varID);
-        if (!child || !child->isValid())
-            return E_FAIL;
-        descr = child->text(QAccessible::Description);
-    } else {
-        descr = accessible->text(QAccessible::Description);
-    }
-    if (descr.size()) {
-        *pszDescription = QStringToBSTR(descr);
-        return S_OK;
+    if (accessible->role() != QAccessible::Window)
+    {
+        QString descr;
+        if (varID.lVal) {
+            QAccessibleInterface *child = childPointer(accessible, varID);
+            if (!child || !child->isValid())
+                return E_FAIL;
+            descr = child->text(QAccessible::Description);
+        }
+        else {
+            descr = accessible->text(QAccessible::Description);
+        }
+        if (descr.size()) {
+            *pszDescription = QStringToBSTR(descr);
+            return S_OK;
+        }
     }
 
     *pszDescription = 0;
@@ -888,9 +891,12 @@ HRESULT STDMETHODCALLTYPE QWindowsMsaaAccessible::get_accName(VARIANT varID, BST
         }
     }
 
-    QString shortcut = accessible->text(QAccessible::Accelerator);
-    if (!shortcut.isEmpty())
-        name += QLatin1Char(' ') + shortcut;
+    if( accessible->role() != QAccessible::Window )
+    {
+        QString shortcut = accessible->text(QAccessible::Accelerator);
+        if (!shortcut.isEmpty())
+            name += QLatin1Char(' ') + shortcut;
+    }
 
     if (name.size()) {
         *pszName = QStringToBSTR(name);
@@ -1036,15 +1042,18 @@ HRESULT STDMETHODCALLTYPE QWindowsMsaaAccessible::get_accValue(VARIANT varID, BS
         return E_FAIL;
     }
 
-    QString value;
-    if (accessible->valueInterface()) {
-        value = accessible->valueInterface()->currentValue().toString();
-    } else {
-        value = accessible->text(QAccessible::Value);
-    }
-    if (!value.isNull()) {
-        *pszValue = QStringToBSTR(value);
-        return S_OK;
+    if (accessible->role() != QAccessible::Window)
+    {
+        QString value;
+        if (accessible->valueInterface()) {
+            value = accessible->valueInterface()->currentValue().toString();
+        } else {
+            value = accessible->text(QAccessible::Value);
+        }
+        if (!value.isNull()) {
+            *pszValue = QStringToBSTR(value);
+            return S_OK;
+        }
     }
 
     *pszValue = 0;
