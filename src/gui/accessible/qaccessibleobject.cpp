@@ -210,8 +210,6 @@ QString QAccessibleApplication::text(QAccessible::Text t) const
     switch (t) {
     case QAccessible::Name:
         return QGuiApplication::applicationName();
-    case QAccessible::Description:
-        return QGuiApplication::applicationFilePath();
     default:
         break;
     }
