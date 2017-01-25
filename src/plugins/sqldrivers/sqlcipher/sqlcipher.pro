@@ -14,9 +14,9 @@ INCLUDEPATH += $${SQLCIPHER_DIR}/include/sqlcipher
 
 win32: {
     CONFIG(release, debug|release) {
-        LIBS += $${SQLCIPHER_DIR}/lib/debug/libsqlcipher.lib
+        LIBS += $${SQLCIPHER_DIR}/lib/libsqlcipher.lib
     } else {
-        LIBS += $${SQLCIPHER_DIR}/lib/release/libsqlcipher.lib
+        LIBS += $${SQLCIPHER_DIR}/lib/libsqlcipherd.lib
     }
     LIBS += -llibeay32
 }
