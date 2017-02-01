@@ -122,6 +122,7 @@ static void populateRoleMap()
     roleMap[QAccessible::Separator] = NSAccessibilitySplitterRole;
     roleMap[QAccessible::ToolBar] = NSAccessibilityToolbarRole;
     roleMap[QAccessible::PageTab] = NSAccessibilityRadioButtonRole;
+    roleMap[QAccessible::PageTabList] = NSAccessibilityTabGroupRole;
     roleMap[QAccessible::ButtonMenu] = NSAccessibilityMenuButtonRole;
     roleMap[QAccessible::ButtonDropDown] = NSAccessibilityPopUpButtonRole;
     roleMap[QAccessible::SpinBox] = NSAccessibilityIncrementorRole;
@@ -197,7 +198,8 @@ NSString *macSubrole(QAccessibleInterface *interface)
         return NSAccessibilitySearchFieldSubrole;
     if (s.passwordEdit)
         return NSAccessibilitySecureTextFieldSubrole;
-    return nil;
+
+    return NSAccessibilityUnknownSubrole;
 }
 
 /*

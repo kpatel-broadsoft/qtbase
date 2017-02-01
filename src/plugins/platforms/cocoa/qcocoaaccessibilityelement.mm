@@ -179,7 +179,6 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
         defaultAttributes = [[NSArray alloc] initWithObjects:
         NSAccessibilityRoleAttribute,
         NSAccessibilityRoleDescriptionAttribute,
-        NSAccessibilitySubroleAttribute,
         NSAccessibilityChildrenAttribute,
         NSAccessibilityFocusedAttribute,
         NSAccessibilityParentAttribute,
@@ -205,6 +204,7 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
             NSAccessibilityNumberOfCharactersAttribute,
             NSAccessibilitySelectedTextAttribute,
             NSAccessibilitySelectedTextRangeAttribute,
+            NSAccessibilitySubroleAttribute,
             NSAccessibilityVisibleCharacterRangeAttribute,
             NSAccessibilityInsertionPointLineNumberAttribute,
             nil
@@ -221,6 +221,10 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
         ]];
     }
 
+    if (iface->role() == QAccessible::PageTabList) {
+        [attributes addObject:NSAccessibilityTabsAttribute];
+    }
+
     return [attributes autorelease];
 }
 
@@ -229,19 +233,20 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
     if (!iface || !iface->isValid())
         return nil;
 
+    if (QAccessibleInterface *parent = iface->parent()) {
+        QAccessible::Id parentId = QAccessible::uniqueId(parent);
+        return [QMacAccessibilityElement elementWithId: parentId];
+    }
+
     if (QWindow *window = iface->window()) {
-        QCocoaWindow *win = static_cast<QCocoaWindow*>(window->handle());
-        return win->qtView();
+        QPlatformWindow *platformWindow = window->handle();
+        if (platformWindow) {
+            QCocoaWindow *win = static_cast<QCocoaWindow*>(platformWindow);
+            return win->qtView();
+        }
     }
 
-    QAccessibleInterface *parent = iface->parent();
-    if (!parent) {
-        qWarning() << "INVALID PARENT FOR INTERFACE: " << iface;
-        return nil;
-    }
-
-    QAccessible::Id parentId = QAccessible::uniqueId(parent);
-    return [QMacAccessibilityElement elementWithId: parentId];
+    return nil;
 }
 
 
@@ -270,6 +275,8 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
     } else if ([attribute isEqualToString:NSAccessibilitySubroleAttribute]) {
         return QCocoaAccessible::macSubrole(iface);
     } else if ([attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute]) {
+        if (iface->role() == QAccessible::PageTab)
+            return QCFString::toNSString(iface->text(QAccessible::Description));
         return NSAccessibilityRoleDescription(role, [self accessibilityAttributeValue:NSAccessibilitySubroleAttribute]);
     } else if ([attribute isEqualToString:NSAccessibilityChildrenAttribute]) {
         return QCocoaAccessible::unignoredChildren(iface);
@@ -295,6 +302,8 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
     } else if ([attribute isEqualToString:NSAccessibilityTitleAttribute]) {
         return QCFString::toNSString(iface->text(QAccessible::Name));
     } else if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute]) {
+        if (iface->role() == QAccessible::PageTab)
+            return nil;
         return QCFString::toNSString(iface->text(QAccessible::Description));
     } else if ([attribute isEqualToString:NSAccessibilityEnabledAttribute]) {
         return [NSNumber numberWithBool:!iface->state().disabled];
@@ -349,6 +358,17 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
         return [self minValueAttribute:iface];
     } else if ([attribute isEqualToString:NSAccessibilityMaxValueAttribute]) {
         return [self maxValueAttribute:iface];
+    } else if ([attribute isEqualToString:NSAccessibilityTabsAttribute]) {
+        NSMutableArray* tabs = [[[NSMutableArray alloc] init] autorelease];
+        NSArray* children =
+                [self accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
+        for (id child in children) {
+            if ([[child accessibilityAttributeValue:NSAccessibilityRoleAttribute]
+                isEqual:NSAccessibilityRadioButtonRole]) {
+                [tabs addObject:child];
+            }
+        }
+        return tabs;
     }
 
     return nil;
