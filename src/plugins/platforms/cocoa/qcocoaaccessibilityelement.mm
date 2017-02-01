@@ -185,7 +185,6 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
         defaultAttributes = [[NSArray alloc] initWithObjects:
         NSAccessibilityRoleAttribute,
         NSAccessibilityRoleDescriptionAttribute,
-        NSAccessibilitySubroleAttribute,
         NSAccessibilityChildrenAttribute,
         NSAccessibilityFocusedAttribute,
         NSAccessibilityParentAttribute,
@@ -211,6 +210,7 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
             NSAccessibilityNumberOfCharactersAttribute,
             NSAccessibilitySelectedTextAttribute,
             NSAccessibilitySelectedTextRangeAttribute,
+            NSAccessibilitySubroleAttribute,
             NSAccessibilityVisibleCharacterRangeAttribute,
             NSAccessibilityInsertionPointLineNumberAttribute,
             nil
@@ -225,6 +225,10 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
             NSAccessibilityMaxValueAttribute,
             nil
         ]];
+    }
+
+    if (iface->role() == QAccessible::PageTabList) {
+        [attributes addObject:NSAccessibilityTabsAttribute];
     }
 
     return [attributes autorelease];
@@ -282,6 +286,8 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
     } else if ([attribute isEqualToString:NSAccessibilitySubroleAttribute]) {
         return QCocoaAccessible::macSubrole(iface);
     } else if ([attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute]) {
+        if (iface->role() == QAccessible::PageTab)
+            return iface->text(QAccessible::Description).toNSString();
         return NSAccessibilityRoleDescription(role, [self accessibilityAttributeValue:NSAccessibilitySubroleAttribute]);
     } else if ([attribute isEqualToString:NSAccessibilityChildrenAttribute]) {
         return QCocoaAccessible::unignoredChildren(iface);
@@ -309,6 +315,8 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
             return nil;
         return iface->text(QAccessible::Name).toNSString();
     } else if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute]) {
+        if (iface->role() == QAccessible::PageTab)
+            return nil;
         return iface->text(QAccessible::Description).toNSString();
     } else if ([attribute isEqualToString:NSAccessibilityEnabledAttribute]) {
         return [NSNumber numberWithBool:!iface->state().disabled];
@@ -363,6 +371,17 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
         return [self minValueAttribute:iface];
     } else if ([attribute isEqualToString:NSAccessibilityMaxValueAttribute]) {
         return [self maxValueAttribute:iface];
+    } else if ([attribute isEqualToString:NSAccessibilityTabsAttribute]) {
+        NSMutableArray* tabs = [[[NSMutableArray alloc] init] autorelease];
+        NSArray* children =
+                [self accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
+        for (id child in children) {
+            if ([[child accessibilityAttributeValue:NSAccessibilityRoleAttribute]
+                isEqual:NSAccessibilityRadioButtonRole]) {
+                [tabs addObject:child];
+            }
+        }
+        return tabs;
     }
 
     return nil;
