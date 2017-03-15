@@ -203,7 +203,7 @@ public:
         TouchDrag // Mouse cursor suppressed, use window as cursor.
     };
 
-    explicit QWindowsOleDropSource(QWindowsDrag *drag);
+    explicit QWindowsOleDropSource(QWindowsDrag *drag, Qt::DropAction overriddenDropAction = Qt::IgnoreAction);
     virtual ~QWindowsOleDropSource();
 
     void createCursors();
@@ -238,6 +238,7 @@ private:
     Qt::MouseButtons m_currentButtons;
     ActionCursorMap m_cursors;
     QWindowsDragCursorWindow *m_touchDragWindow;
+    const Qt::DropAction m_overriddenDropAction;
 
     ULONG m_refs;
 #ifndef QT_NO_DEBUG_STREAM
@@ -245,11 +246,12 @@ private:
 #endif
 };
 
-QWindowsOleDropSource::QWindowsOleDropSource(QWindowsDrag *drag)
+QWindowsOleDropSource::QWindowsOleDropSource(QWindowsDrag *drag, Qt::DropAction overriddenDropAction)
     : m_mode(QWindowsCursor::cursorState() != QWindowsCursor::CursorSuppressed ? MouseDrag : TouchDrag)
     , m_drag(drag)
     , m_currentButtons(Qt::NoButton)
     , m_touchDragWindow(0)
+    , m_overriddenDropAction(overriddenDropAction)
     , m_refs(1)
 {
     qCDebug(lcQpaMime) << __FUNCTION__ << m_mode;
@@ -440,7 +442,10 @@ QWindowsOleDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState)
 QT_ENSURE_STACK_ALIGNED_FOR_SSE STDMETHODIMP
 QWindowsOleDropSource::GiveFeedback(DWORD dwEffect)
 {
-    const Qt::DropAction action = translateToQDragDropAction(dwEffect);
+    Qt::DropAction action = translateToQDragDropAction(dwEffect);
+    if (action == Qt::IgnoreAction) {
+        action = m_overriddenDropAction;
+    }
     m_drag->updateAction(action);
 
     const qint64 currentCacheKey = m_drag->currentDrag()->dragCursor(action).cacheKey();
@@ -717,7 +722,13 @@ Qt::DropAction QWindowsDrag::drag(QDrag *drag)
     Qt::DropAction dragResult = Qt::IgnoreAction;
 
     DWORD resultEffect;
-    QWindowsOleDropSource *windowDropSource = new QWindowsOleDropSource(this);
+    Qt::DropAction overriddenDropAction = Qt::IgnoreAction;
+    const QString overriddenDropActionFormat = QStringLiteral("btbc/overridden-drop-action");
+    if (dropData && dropData->hasFormat(overriddenDropActionFormat))
+    {
+        overriddenDropAction = static_cast<Qt::DropAction>(dropData->data(overriddenDropActionFormat).toUInt());
+    }
+    QWindowsOleDropSource *windowDropSource = new QWindowsOleDropSource(this, overriddenDropAction);
     windowDropSource->createCursors();
     QWindowsOleDataObject *dropDataObject = new QWindowsOleDataObject(dropData);
     const Qt::DropActions possibleActions = drag->supportedActions();
