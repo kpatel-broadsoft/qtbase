@@ -336,6 +336,11 @@ bool QGlyphRun::underline() const
     return d->flags & Underline;
 }
 
+bool QGlyphRun::spellCheckUnderline() const
+{
+    return d->flags & SpellCheckUnderline;
+}
+
 /*!
   Indicates that this QGlyphRun should be painted with an underline decoration if \a underline is
   true. Otherwise the QGlyphRun should be painted with no underline decoration.
@@ -345,6 +350,11 @@ bool QGlyphRun::underline() const
 void QGlyphRun::setUnderline(bool underline)
 {
     setFlag(Underline, underline);
+}
+
+void QGlyphRun::setSpellCheckUnderline(bool spellCheckUnderline)
+{
+    setFlag(SpellCheckUnderline, spellCheckUnderline);
 }
 
 /*!

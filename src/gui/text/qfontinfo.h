@@ -68,6 +68,7 @@ public:
     int weight() const;
     inline bool bold() const { return weight() > QFont::Normal; }
     bool underline() const;
+    bool spellCheckUnderline() const;
     bool overline() const;
     bool strikeOut() const;
     bool fixedPitch() const;
