@@ -175,12 +175,13 @@ public:
     int dpi;
     int screen;
 
-    uint underline  :  1;
-    uint overline   :  1;
-    uint strikeOut  :  1;
-    uint kerning    :  1;
-    uint capital    :  3;
-    bool letterSpacingIsAbsolute : 1;
+    uint underline               :  1;
+    uint spellCheckUnderline     :  1;
+    uint overline                :  1;
+    uint strikeOut               :  1;
+    uint kerning                 :  1;
+    uint capital                 :  3;
+    bool letterSpacingIsAbsolute :  1;
 
     QFixed letterSpacing;
     QFixed wordSpacing;

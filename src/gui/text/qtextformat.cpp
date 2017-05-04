@@ -371,6 +371,7 @@ void QTextFormatPrivate::recalcFont() const
                 break;
             case QTextFormat::TextUnderlineStyle:
                 f.setUnderline(static_cast<QTextCharFormat::UnderlineStyle>(props.at(i).value.toInt()) == QTextCharFormat::SingleUnderline);
+                f.setSpellCheckUnderline(static_cast<QTextCharFormat::UnderlineStyle>(props.at(i).value.toInt()) == QTextCharFormat::SpellCheckUnderline);
                 break;
             case QTextFormat::FontOverline:
                 f.setOverline(props.at(i).value.toBool());
@@ -1923,6 +1924,8 @@ void QTextCharFormat::setFont(const QFont &font, FontPropertiesInheritanceBehavi
         setFontItalic(font.style() != QFont::StyleNormal);
     if (mask & QFont::UnderlineResolved)
         setUnderlineStyle(font.underline() ? SingleUnderline : NoUnderline);
+    if (mask & QFont::SpellCheckUnderlineResolved)
+        setUnderlineStyle(SpellCheckUnderline);
     if (mask & QFont::OverlineResolved)
         setFontOverline(font.overline());
     if (mask & QFont::StrikeOutResolved)
