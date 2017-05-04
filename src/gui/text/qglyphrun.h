@@ -56,11 +56,12 @@ class Q_GUI_EXPORT QGlyphRun
 {
 public:
     enum GlyphRunFlag {
-        Overline        = 0x01,
-        Underline       = 0x02,
-        StrikeOut       = 0x04,
-        RightToLeft     = 0x08,
-        SplitLigature   = 0x10
+        Overline            = 0x01,
+        Underline           = 0x02,
+        StrikeOut           = 0x04,
+        RightToLeft         = 0x08,
+        SplitLigature       = 0x10,
+        SpellCheckUnderline = 0x20
     };
     Q_DECLARE_FLAGS(GlyphRunFlags, GlyphRunFlag)
 
@@ -98,6 +99,9 @@ public:
 
     void setUnderline(bool underline);
     bool underline() const;
+
+    void setSpellCheckUnderline(bool spellCheckUnderline);
+    bool spellCheckUnderline() const;
 
     void setStrikeOut(bool strikeOut);
     bool strikeOut() const;

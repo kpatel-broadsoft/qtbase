@@ -156,7 +156,8 @@ public:
         WordSpacingResolved         = 0x4000,
         HintingPreferenceResolved   = 0x8000,
         StyleNameResolved           = 0x10000,
-        AllPropertiesResolved       = 0x1ffff
+        SpellCheckUnderlineResolved = 0x20000,
+        AllPropertiesResolved       = 0x3ffff
     };
 
     QFont();
@@ -196,6 +197,9 @@ public:
 
     bool underline() const;
     void setUnderline(bool);
+
+    bool spellCheckUnderline() const;
+    void setSpellCheckUnderline(bool);
 
     bool overline() const;
     void setOverline(bool);
