@@ -168,14 +168,14 @@ Q_GUI_EXPORT int qt_defaultDpi()
 
 QFontPrivate::QFontPrivate()
     : engineData(0), dpi(qt_defaultDpi()), screen(0),
-      underline(false), overline(false), strikeOut(false), kerning(true),
+      underline(false), spellCheckUnderline(false), overline(false), strikeOut(false), kerning(true),
       capital(0), letterSpacingIsAbsolute(false), scFont(0)
 {
 }
 
 QFontPrivate::QFontPrivate(const QFontPrivate &other)
     : request(other.request), engineData(0), dpi(other.dpi), screen(other.screen),
-      underline(other.underline), overline(other.overline),
+      underline(other.underline), spellCheckUnderline(other.spellCheckUnderline), overline(other.overline),
       strikeOut(other.strikeOut), kerning(other.kerning),
       capital(other.capital), letterSpacingIsAbsolute(other.letterSpacingIsAbsolute),
       letterSpacing(other.letterSpacing), wordSpacing(other.wordSpacing),
@@ -289,6 +289,9 @@ void QFontPrivate::resolve(uint mask, const QFontPrivate *other)
 
     if (! (mask & QFont::UnderlineResolved))
         underline = other->underline;
+
+    if (! (mask & QFont::SpellCheckUnderlineResolved))
+        spellCheckUnderline = other->spellCheckUnderline;
 
     if (! (mask & QFont::OverlineResolved))
         overline = other->overline;
@@ -1093,6 +1096,11 @@ bool QFont::underline() const
     return d->underline;
 }
 
+bool QFont::spellCheckUnderline() const
+{
+    return d->spellCheckUnderline;
+}
+
 /*!
     If \a enable is true, sets underline on; otherwise sets underline
     off.
@@ -1108,6 +1116,17 @@ void QFont::setUnderline(bool enable)
 
     d->underline = enable;
     resolve_mask |= QFont::UnderlineResolved;
+}
+
+void QFont::setSpellCheckUnderline(bool enable)
+{
+    if ((resolve_mask & QFont::SpellCheckUnderlineResolved) && d->spellCheckUnderline == enable)
+        return;
+
+    QFontPrivate::detachButKeepEngineData(this);
+
+    d->spellCheckUnderline = enable;
+    resolve_mask |= QFont::SpellCheckUnderlineResolved;
 }
 
 /*!
@@ -1623,6 +1642,7 @@ bool QFont::operator==(const QFont &f) const
             || (f.d->request   == d->request
                 && f.d->request.pointSize == d->request.pointSize
                 && f.d->underline == d->underline
+                && f.d->spellCheckUnderline == d->spellCheckUnderline
                 && f.d->overline  == d->overline
                 && f.d->strikeOut == d->strikeOut
                 && f.d->kerning == d->kerning
@@ -2548,6 +2568,11 @@ int QFontInfo::weight() const
 bool QFontInfo::underline() const
 {
     return d->underline;
+}
+
+bool QFontInfo::spellCheckUnderline() const
+{
+    return d->spellCheckUnderline;
 }
 
 /*!
