@@ -22,6 +22,7 @@
             "sql-odbc": "boolean",
             "sql-psql": "boolean",
             "sql-sqlite": "boolean",
+            "sql-sqlcipher": "boolean",
             "sql-sqlite2": "boolean",
             "sql-tds": "boolean",
             "plugin-sql-db2": { "type": "void", "name": "sql-db2" },
@@ -31,6 +32,7 @@
             "plugin-sql-odbc": { "type": "void", "name": "sql-odbc" },
             "plugin-sql-psql": { "type": "void", "name": "sql-psql" },
             "plugin-sql-sqlite": { "type": "void", "name": "sql-sqlite" },
+            "plugin-sql-sqlcipher": { "type": "void", "name": "sql-sqlcipher" },
             "plugin-sql-sqlite2": { "type": "void", "name": "sql-sqlite2" },
             "plugin-sql-tds": { "type": "void", "name": "sql-tds" }
         }
@@ -143,6 +145,14 @@
                 "-lsqlite"
             ]
         },
+        "sqlcipher": {
+            "label": "SQLCipher",
+            "test": "unix/sqlcipher",
+            "sources": [
+                { "libs": "$$(SQLCIPHER_DIR)/lib/libsqlcipher.a -lcrypto", "condition": "!config.win32" },
+                { "libs": "$$(SQLCIPHER_DIR)/lib/libsqlcipher.lib -llibeay32", "condition": "config.win32" }
+            ]
+        },
         "sqlite3": {
             "label": "SQLite (version 3)",
             "export": "sqlite",
@@ -199,6 +209,11 @@
             "condition": "libs.sqlite2",
             "output": [ "privateFeature" ]
         },
+        "sql-sqlcipher": {
+            "label": "SQLCipher",
+            "condition": "libs.sqlcipher",
+            "output": [ "privateFeature" ]
+        },
         "sql-sqlite": {
             "label": "SQLite",
             "condition": "features.datestring",
@@ -232,7 +247,7 @@ Oracle driver, as the current build will most likely fail."
             "section": "Qt Sql",
             "entries": [
                 "sql-db2", "sql-ibase", "sql-mysql", "sql-oci", "sql-odbc", "sql-psql",
-                "sql-sqlite2", "sql-sqlite", "system-sqlite", "sql-tds"
+                "sql-sqlite2", "sql-sqlite", "sql-sqlcipher", "system-sqlite", "sql-tds"
             ]
         }
     ]
