@@ -609,10 +609,12 @@ void QHttpSocketEngine::slotSocketReadNotification()
         if (d->credentialsSent && priv->phase != QAuthenticatorPrivate::Phase2) {
             // Remember that (e.g.) NTLM is two-phase, so only reset when the authentication is not currently in progress.
             //407 response again means the provided username/password were invalid.
+            QAuthenticatorPrivate::Phase origPhase = priv->phase;
             d->authenticator = QAuthenticator(); //this is needed otherwise parseHttpResponse won't set the state, and then signal isn't emitted.
             d->authenticator.detach();
             priv = QAuthenticatorPrivate::getPrivate(d->authenticator);
             priv->hasFailed = true;
+            priv->phase = origPhase;
         }
 
         priv->parseHttpResponse(d->reply->header(), true);
