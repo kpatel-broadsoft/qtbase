@@ -66,7 +66,7 @@
 /*!
     Overridden to ensure that the zoomed state always results in a maximized
     window, which would otherwise not be the case for borderless windows.
-*/
+*//*
 - (NSRect)windowWillUseStandardFrame:(NSWindow *)window defaultFrame:(NSRect)newFrame
 {
     Q_UNUSED(newFrame);
@@ -76,7 +76,7 @@
     // behavior for both use-cases/APIs.
     Q_ASSERT(window == m_cocoaWindow->nativeWindow());
     return NSRectFromCGRect(m_cocoaWindow->screen()->availableGeometry().toCGRect());
-}
+}*/
 
 #if QT_MACOS_DEPLOYMENT_TARGET_BELOW(__MAC_10_11)
 /*
