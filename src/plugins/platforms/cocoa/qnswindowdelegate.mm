@@ -75,7 +75,13 @@
     // window.screen.visibleFrame directly, as that ensures we have the same
     // behavior for both use-cases/APIs.
     Q_ASSERT(window == m_cocoaWindow->nativeWindow());
-    return NSRectFromCGRect(m_cocoaWindow->screen()->availableGeometry().toCGRect());
+    if ( (m_cocoaWindow->m_windowFlags & Qt::FramelessWindowHint) == Qt::FramelessWindowHint )
+        return NSRectFromCGRect(m_cocoaWindow->screen()->availableGeometry().toCGRect());
+    else
+    {
+        newFrame.origin.x = m_cocoaWindow->geometry().left();
+        return newFrame;
+    }
 }
 
 #if QT_MACOS_DEPLOYMENT_TARGET_BELOW(__MAC_10_11)
