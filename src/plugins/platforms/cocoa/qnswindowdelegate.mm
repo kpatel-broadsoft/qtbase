@@ -79,7 +79,13 @@
         return NSRectFromCGRect(m_cocoaWindow->screen()->availableGeometry().toCGRect());
     else
     {
-        newFrame.origin.x = m_cocoaWindow->geometry().left();
+        if ( (m_cocoaWindow->m_windowFlags & Qt::ToolTip) == Qt::ToolTip )
+        {
+            newFrame.size.width = m_cocoaWindow->geometry().size().width();
+            newFrame.size.height = m_cocoaWindow->geometry().size().height();
+        }
+        else
+            newFrame.origin.x = m_cocoaWindow->geometry().left();
         return newFrame;
     }
 }
