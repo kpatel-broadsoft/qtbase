@@ -118,7 +118,6 @@ QCocoaMenuItem::~QCocoaMenuItem()
     } else {
         if (m_menu && m_menu->attachedItem() == m_native)
             m_menu->setAttachedItem(nil);
-        [m_native setTag:0];
         [m_native release];
     }
 
@@ -156,7 +155,6 @@ void QCocoaMenuItem::setMenu(QPlatformMenu *menu)
     } else {
         // we previously had a menu, but no longer
         // clear out our item so the nexy sync() call builds a new one
-        [m_native setTag:0];
         [m_native release];
         m_native = nil;
     }
@@ -221,7 +219,6 @@ void QCocoaMenuItem::setNativeContents(WId item)
 NSMenuItem *QCocoaMenuItem::sync()
 {
     if (m_isSeparator != [m_native isSeparatorItem]) {
-        [m_native setTag:0];
         [m_native release];
         if (m_isSeparator) {
             m_native = [[NSMenuItem separatorItem] retain];
@@ -294,13 +291,11 @@ NSMenuItem *QCocoaMenuItem::sync()
             m_textSynced = true;
             m_merged = true;
             [mergeItem retain];
-            [m_native setTag:0];
             [m_native release];
             m_native = mergeItem;
             [m_native setTag:reinterpret_cast<NSInteger>(this)];
         } else if (m_merged) {
             // was previously merged, but no longer
-            [m_native setTag:0];
             [m_native release];
             m_native = nil; // create item below
             m_merged = false;
