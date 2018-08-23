@@ -250,6 +250,7 @@ void QCocoaSystemTrayIcon::updateMenu(QPlatformMenu *menu)
         return;
 
     m_sys->item->menu = static_cast<QCocoaMenu *>(menu);
+    [[m_sys->item item] setMenu:static_cast<QCocoaMenu *>(menu)->nsMenu()];
     if (menu && [m_sys->item->menu->nsMenu() numberOfItems] > 0) {
         [[m_sys->item item] setHighlightMode:YES];
     } else {
